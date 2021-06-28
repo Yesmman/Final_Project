@@ -1,5 +1,5 @@
 import pygame
-from Smooth.Objects_smooth import Snake, Apple, Surface, Wall, \
+from Smooth.Objects_smooth import Snake, Apple, Wall, \
     Screen, Bad_Apple, dict_of_not_blocked_buttons
 
 

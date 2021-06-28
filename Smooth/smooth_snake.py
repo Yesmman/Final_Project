@@ -11,16 +11,23 @@ def game():
     snake = Snake()
     apple = Apple()
     bad_apple = Bad_Apple()
+
     bad_apple_is_on = False
+
     snake.length = 1
+
     score = 0
+
     surface = create_screen(screen.height, screen.width)
+
     clock = start_clock()
 
     snake.first_spawn(screen.height, screen.width)
     apple.spawn(snake, screen.height, screen.width)
 
-    font = pygame.font.SysFont("arial", 20, bold=True)
+    font = pygame.font.SysFont(name="arial",
+                               size=20,
+                               bold=True)
 
     menu = create_pause_menu(False)
 
@@ -37,7 +44,7 @@ def game():
                 if event.key == pygame.K_r:
                     pause = not pause
                     if pause:
-                        menu = create_pause_menu(True)
+                        menu = create_pause_menu(on=True)
                     if not menu.is_enabled():
                         pause = False
                 if event.key == pygame.K_t:
@@ -55,7 +62,9 @@ def game():
         if not pause:
 
             surface.fill(pygame.Color(screen.color))
-            score_text = font.render(f'Score: {score}', True, "orange")
+            score_text = font.render(text=f'Score: {score}',
+                                     antialias=True,
+                                     color="orange")
             surface.blit(score_text, (0, 0))
             wall_teleport(snake, screen.height, screen.width)
 

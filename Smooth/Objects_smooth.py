@@ -101,21 +101,21 @@ class Wall:
             self.wall.append((self.y, self.x - snake.head_size))
 
 
-class Surface:
-    x = 0
-    y = 0
-    color = "white"
-    body = [(x, y)]
-
-    def generate_surface(self, snake: Snake, height, width):
-        while snake.head_size + self.x <= width:
-            while snake.head_size + self.y <= height:
-                print(self.body)
-                self.body.append((self.x - snake.head_size, self.y))
-                self.y += snake.head_size
-            self.x += snake.head_size
-            self.y = 0
-
+# class Surface:
+#     x = 0
+#     y = 0
+#     color = "white"
+#     body = [(x, y)]
+#
+#     def generate_surface(self, snake: Snake, height, width):
+#         while snake.head_size + self.x <= width:
+#             while snake.head_size + self.y <= height:
+#                 print(self.body)
+#                 self.body.append((self.x - snake.head_size, self.y))
+#                 self.y += snake.head_size
+#             self.x += snake.head_size
+#             self.y = 0
+#  не используется
 
 class Screen:
     height = 500
@@ -156,15 +156,15 @@ def dict_of_not_blocked_buttons():
     }
     return dictionary
 
-
-def dict_buttons_to_steps():
-    dictionary = {
-        "w": (0, -1),
-        "s": (0, 1),
-        "d": (1, 0),
-        "a": (-1, 0),
-    }
-    return dictionary
+#
+# def dict_buttons_to_steps():
+#     dictionary = {
+#         "w": (0, -1),
+#         "s": (0, 1),
+#         "d": (1, 0),
+#         "a": (-1, 0),
+#     }
+#     return dictionary
 
 
 def enable_moving(snake: Snake):
