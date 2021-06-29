@@ -3,9 +3,12 @@ from functools import partial
 from pygame_menu.examples import create_example_window
 
 from Smooth.game_functions_smooth import change_snake_color, change_apple_color, \
-    change_speed, change_screen_color, change_screen_height, change_screen_width, change_bad_apple_color
+    change_speed, change_screen_color, change_screen_height, change_screen_width, change_bad_apple_color, \
+    change_mode, change_wall_color
 
 from Smooth.Objects_smooth import Snake, Screen, Apple, Bad_Apple, Wall
+
+import pygame
 
 
 def main_menu():
@@ -19,7 +22,7 @@ def main_menu():
     )
 
     menu.add.button("Play", play)
-    menu.add.button("Settings", partial(func=to_settings,
+    menu.add.button("Settings", partial(to_settings,
                                         menu=menu,
                                         surface=surface,
                                         main=True))
@@ -51,20 +54,20 @@ def settings(surface, main):
         width=400,
         title="Settings"
     )
-    menu.add.button("Color", partial(func=to_color_settings,
+    menu.add.button("Color", partial(to_color_settings,
                                      menu=menu,
                                      surface=surface,
                                      main=main))
 
-    menu.add.button("Controls", partial(func=to_controls,
+    menu.add.button("Controls", partial(to_controls,
                                         menu=menu,
                                         surface=surface,
                                         main=main))
     if main:
-        menu.add.button("Back", partial(func=from_settings_to_main_menu,
+        menu.add.button("Back", partial(from_settings_to_main_menu,
                                         menu=menu))
     else:
-        menu.add.button("Back", partial(func=from_settings_to_pause_menu,
+        menu.add.button("Back", partial(from_settings_to_pause_menu,
                                         menu=menu))
 
     menu.mainloop(surface)
@@ -116,18 +119,45 @@ def create_pause_menu(on):
                                         window_size=(Screen.height, Screen.width))
 
         menu.add.button("Continue", menu.disable)
-        menu.add.button("Settings", partial(func=to_settings,
+
+        menu.add.button("Settings", partial(to_settings,
                                             menu=menu,
                                             surface=surface,
                                             main=False))
+
+        menu.add.button("Help", partial(to_help_menu,
+                                        menu=menu,
+                                        surface=surface,
+                                        main=False))
+
         menu.add.button("Quit", main_menu)
 
         menu.mainloop(surface)
     return menu
 
 
-def color(surface, main):
+def to_help_menu(menu, surface, main):
+    menu.close()
+    menu.disable()
 
+    help_menu(surface, main)
+
+
+def help_menu(surface, main):
+    height = 400
+    width = 400
+    menu = pygame_menu.Menu(
+        height=height,
+        width=width,
+        title="Help"
+    )
+
+    menu.add.button('Back', partial(from_settings_to_pause_menu, menu=menu))
+
+    menu.mainloop(surface)
+
+
+def color(surface, main):
     menu = pygame_menu.Menu(
         height=400,
         width=400,
@@ -138,6 +168,7 @@ def color(surface, main):
         ("Blue", "blue"),
         ("Red", "red"),
         ("Yellow", "yellow"),
+        ("Brown", 'brown'),
         ("White", "white"),
         ("Pink", "pink"),
         ("Black", "black"),
@@ -158,12 +189,17 @@ def color(surface, main):
                       items=list_of_colors,
                       onchange=change_bad_apple_color)
 
+    menu.add.selector(title="Wall color",
+                      default=list_of_colors.index((Wall.color.title(), Wall.color)),
+                      items=list_of_colors,
+                      onchange=change_wall_color)
+
     menu.add.selector(title="Background color",
                       default=list_of_colors.index((Screen.color.title(), Screen.color)),
                       items=list_of_colors,
                       onchange=change_screen_color)
 
-    menu.add.button("Back", partial(func=back_from_colors_to_settings,
+    menu.add.button("Back", partial(back_from_colors_to_settings,
                                     menu=menu,
                                     surface=surface,
                                     main=main))
@@ -209,6 +245,15 @@ def controls(surface, main):
     label.hide()
     label_done.hide()
 
+    list_of_modes = [
+        ("Side wall", "Side wall on"),
+        ("Without side walls", "Side wall off")
+    ]
+    menu.add.selector("Wall mode",
+                      default=1,
+                      items=list_of_modes,
+                      onchange=change_mode)
+
     def commit():
         for index in range(len(list_of_buttons)):
             get_value(button=list_of_buttons[index],
@@ -216,7 +261,7 @@ def controls(surface, main):
 
     menu.add.button("Commit", commit)
 
-    menu.add.button("Back", partial(func=to_settings,
+    menu.add.button("Back", partial(to_settings,
                                     menu=menu,
                                     surface=surface,
                                     main=main))

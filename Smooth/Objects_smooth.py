@@ -5,10 +5,10 @@ import pygame
 
 class Snake:
     length = 1
-    x = 0
-    y = 0
+    x: int
+    y: int
 
-    body = [(x, y)]
+    body = []
 
     head_size = 25
     color = "green"
@@ -17,8 +17,8 @@ class Snake:
     step_x = 0
     step_y = 0
 
-    def moving(self, not_blocked_button: dict, code):
-        # print(self.body)
+    def moving(self, not_blocked_button: dict):
+
         self.body.append((self.x, self.y))
         self.body = self.body[-self.length:]
         buttons = dict_key_to_buttons()
@@ -53,12 +53,17 @@ class Snake:
 
         self.length += 5
 
-        self.speed += 4
+        self.speed += 1
 
-    def first_spawn(self, height, width):
-        self.body = [(self.x, self.y)]
+    def first_spawn(self, height, width, wall=False):
+
+        self.body.clear()
         self.x = randrange(0, width, self.head_size)
         self.y = randrange(0, height, self.head_size)
+        self.body.append((self.x, self.y))
+        if wall:
+            if self.body[-1] in Wall.wall:
+                self.first_spawn(height, width, True)
 
     def __repr__(self):
         return str(self.body)
@@ -72,11 +77,15 @@ class Apple:
 
     size = 25
 
-    def spawn(self, snake: Snake, height, width):
+    def spawn(self, snake: Snake, height, width, wall=False):
+
         self.x = randrange(0, width, snake.head_size)
         self.y = randrange(0, height, snake.head_size)
         if (self.x, self.y) in snake.body:
             self.spawn(snake, height, width)
+        if wall:
+            if (self.x, self.y) in Wall.wall:
+                self.spawn(snake, height, width, True)
 
 
 class Bad_Apple(Apple):
@@ -84,38 +93,33 @@ class Bad_Apple(Apple):
 
 
 class Wall:
-    color = "blue"
+    color = "brown"
     x = 0
     y = 0
     wall = [(x, y)]
 
     def generate_side_walls(self, snake: Snake, height, width):
+        self.x = 0
+        self.y = 0
+        self.wall.clear()
+        self.wall.append((self.x, self.y))
         while snake.head_size + self.x <= width:
             self.x += snake.head_size
             self.wall.append((self.x, self.y))
             self.wall.append((self.y, self.x))
 
-        while snake.head_size + self.y <= self.x:
+        while snake.head_size + self.y <= height:
             self.y += snake.head_size
             self.wall.append((self.x - snake.head_size, self.y))
             self.wall.append((self.y, self.x - snake.head_size))
 
 
-# class Surface:
-#     x = 0
-#     y = 0
-#     color = "white"
-#     body = [(x, y)]
-#
-#     def generate_surface(self, snake: Snake, height, width):
-#         while snake.head_size + self.x <= width:
-#             while snake.head_size + self.y <= height:
-#                 print(self.body)
-#                 self.body.append((self.x - snake.head_size, self.y))
-#                 self.y += snake.head_size
-#             self.x += snake.head_size
-#             self.y = 0
-#  не используется
+class Mode:
+    mode = "Side wall off"
+
+    def __repr__(self):
+        return self.mode
+
 
 class Screen:
     height = 500
@@ -155,6 +159,7 @@ def dict_of_not_blocked_buttons():
         "a": True,
     }
     return dictionary
+
 
 #
 # def dict_buttons_to_steps():
