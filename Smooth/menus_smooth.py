@@ -2,11 +2,10 @@ import pygame_menu
 from functools import partial
 from pygame_menu.examples import create_example_window
 
-from Smooth.game_functions_smooth import change_snake_color, change_apple_color, \
-    change_speed, change_screen_color, change_screen_height, change_screen_width, change_bad_apple_color, \
-    change_mode, change_wall_color
-
-from Smooth.Objects_smooth import Snake, Screen, Apple, Bad_Apple, Wall
+from Smooth.game_functions_smooth import \
+    change_speed, change_screen_height, change_screen_width, \
+    change_mode, change_color
+from Smooth.Objects_smooth import Snake, Screen, Apple, Bad_Apple, Mode, Wall
 
 import pygame
 
@@ -103,9 +102,13 @@ def to_controls(menu, surface, main):
 
 
 def play():
-    from Smooth.smooth_snake import game
+    from Smooth.smooth_snake import single_game
+    from Smooth.smooth_snake import two_players
 
-    game()
+    if Mode.player == "Two":
+        two_players()
+    else:
+        single_game()
 
 
 def create_pause_menu(on):
@@ -177,27 +180,27 @@ def color(surface, main):
     menu.add.selector(title="Snake color: ",
                       default=list_of_colors.index((Snake.color.title(), Snake.color)),
                       items=list_of_colors,
-                      onchange=change_snake_color)
+                      onchange=partial(change_color, Snake))
 
     menu.add.selector(title="Apple color: ",
                       default=list_of_colors.index((Apple.color.title(), Apple.color)),
                       items=list_of_colors,
-                      onchange=change_apple_color)
+                      onchange=partial(change_color, Apple))
 
     menu.add.selector(title="Bad apple color: ",
                       default=list_of_colors.index((Bad_Apple.color.title(), Bad_Apple.color)),
                       items=list_of_colors,
-                      onchange=change_bad_apple_color)
+                      onchange=partial(change_color, Bad_Apple))
 
     menu.add.selector(title="Wall color",
                       default=list_of_colors.index((Wall.color.title(), Wall.color)),
                       items=list_of_colors,
-                      onchange=change_wall_color)
+                      onchange=partial(change_color, Wall))
 
     menu.add.selector(title="Background color",
                       default=list_of_colors.index((Screen.color.title(), Screen.color)),
                       items=list_of_colors,
-                      onchange=change_screen_color)
+                      onchange=partial(change_color, Screen))
 
     menu.add.button("Back", partial(back_from_colors_to_settings,
                                     menu=menu,
@@ -252,7 +255,17 @@ def controls(surface, main):
     menu.add.selector("Wall mode",
                       default=1,
                       items=list_of_modes,
-                      onchange=change_mode)
+                      onchange=partial(change_mode, "mode"))
+
+    list_num_of_players = [
+        ("Single player", "Single"),
+        ("Two players", "Two")
+    ]
+
+    menu.add.selector("Players: ",
+                      default=1,
+                      items=list_num_of_players,
+                      onchange=partial(change_mode, "player"))
 
     def commit():
         for index in range(len(list_of_buttons)):

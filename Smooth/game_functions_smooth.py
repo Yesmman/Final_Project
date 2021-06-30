@@ -1,6 +1,7 @@
 import pygame
 from Smooth.Objects_smooth import Snake, Apple, Wall, \
-    Screen, Bad_Apple, Mode, dict_of_not_blocked_buttons
+    Screen, Bad_Apple, Mode, Second_Snake, dict_of_not_blocked_buttons, dict2_of_not_blocked_buttons, \
+    dict_key_to_buttons, dict2_key_to_buttons
 
 
 def create_screen(height, width):
@@ -25,14 +26,6 @@ def draw_apple(surface, apple: Apple):
                      rect=(apple.x, apple.y, apple.size, apple.size))
 
 
-#
-# def draw_surface(surface, surface_: Surface, snake: Snake):
-#     [pygame.draw.rect(surface=surface,
-#                       color=surface_.color,
-#                       rect=(x, y, snake.head_size - 2, snake.head_size - 2))
-#      for x, y in surface_.body]
-
-
 def wall_teleport(snake: Snake, height, width):
     if snake.x > width - snake.head_size:
         snake.x = 0
@@ -45,7 +38,7 @@ def wall_teleport(snake: Snake, height, width):
 
 
 #
-def snake_touching(snake: Snake):
+def snake_touching(snake):
     return len(snake.body) != len(set(snake.body))
 
 
@@ -66,24 +59,12 @@ def wall_collision(snake: Snake, wall: Wall):
     return snake.body[-1] in wall.wall
 
 
-def change_snake_color(*value):
-    Snake.color = value[1]
+def snake_collision(snake, snake_2):
+    return snake.body[-1] in snake_2.body
 
 
-def change_apple_color(*value):
-    Apple.color = value[1]
-
-
-def change_bad_apple_color(*value):
-    Bad_Apple.color = value[1]
-
-
-def change_screen_color(*value):
-    Screen.color = value[1]
-
-
-def change_wall_color(*value):
-    Wall.color = value[1]
+def change_color(obj: type, *value):
+    obj.color = value[1]
 
 
 def change_screen_height(value):
@@ -102,5 +83,5 @@ def change_length(value):
     Snake.length = int(value)
 
 
-def change_mode(*value):
-    Mode.mode = value[1]
+def change_mode(attribute, *value):
+    setattr(Mode, attribute, value[1])
