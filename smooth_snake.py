@@ -1,5 +1,9 @@
 from game_functions_smooth import *
 from menus_smooth import create_pause_menu
+import socket
+import pickle
+
+import threading
 
 
 def single_game():
@@ -119,6 +123,7 @@ def two_players():
     pygame.init()
 
     mode = Mode()
+
     screen = Screen()
 
     snake = Snake()
@@ -156,15 +161,18 @@ def two_players():
 
     if mode.mode == "Side wall off":
         wall_is_enable = False
+    start_pause = True
 
     buttons = dict_key_to_buttons()
-    second_buttons = dict2_of_not_blocked_buttons()
-    start_pause = True
-    buttons_dict = dict_of_not_blocked_buttons()
-    second_buttons_dict = dict2_of_not_blocked_buttons()
+    second_buttons = dict2_key_to_buttons()
+
+    snake.buttons_dict = dict_of_not_blocked_buttons()
+    snake_2.buttons_dict = dict2_of_not_blocked_buttons()
 
     snake.first_spawn(screen.height, screen.width, wall_is_enable)
     snake_2.first_spawn(screen.height, screen.width, wall_is_enable)
+
+    # lock = multiprocessing.Lock()
 
     def collision(tuple_1, tuple_2):
         return tuple_1 == tuple_2
@@ -176,8 +184,10 @@ def two_players():
 
     if collision((apple.x, apple.y), snake_2):
         apple.spawn(snake, screen.height, screen.width, wall_is_enable)
+    # t.start()
 
     while not game_end_1 or not game_end_2:
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
@@ -235,7 +245,9 @@ def two_players():
                 snake.body.append((-10, -10))
 
             if not game_end_2:
+
                 draw_snake(surface, snake_2)
+
             else:
                 snake_2.body.clear()
                 snake_2.body.append((-5, -5))
@@ -275,13 +287,12 @@ def two_players():
                 game_end_1 = True
 
             if not game_end_1:
-                buttons_dict = snake.moving(buttons, buttons_dict)
+                snake.buttons_dict = snake.moving(buttons, snake.buttons_dict)
             if not game_end_2:
-                second_buttons_dict = snake_2.moving(second_buttons, second_buttons_dict)
+                snake_2.buttons_dict = snake_2.moving(second_buttons, snake_2.buttons_dict)
 
             buttons = dict_key_to_buttons()
             second_buttons = dict2_key_to_buttons()
-
             surface.blit(score_text, (0, 0))
             surface.blit(score_text_2, (0, screen.width - snake.head_size))
 
@@ -290,4 +301,186 @@ def two_players():
                 for event in pygame.event.get():
                     if event.type == pygame.KEYDOWN:
                         start_pause = False
-            clock.tick(snake.speed)
+            clock.tick(max(snake.speed, snake_2.speed))
+
+
+def online_two_players():
+    pygame.display.set_caption("Snake: 2 players, online")
+    pygame.init()
+
+    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    client.bind(('', 0))
+
+    server = Net.host, Net.port
+
+    mode = Mode()
+    screen = Screen()
+
+    snake = Snake()
+    snake_2 = Online_snake()
+
+    apple = Apple()
+    bad_apple = Bad_Apple()
+    wall = Wall()
+
+    bad_apple_is_on = False
+
+    score = 0
+    score_2 = 0
+
+    surface = create_screen(screen.height, screen.width)
+
+    clock = start_clock()
+
+    font = pygame.font.SysFont(name="arial",
+                               size=20,
+                               bold=True)
+
+    menu = create_pause_menu(False)
+
+    game_end_1 = False
+    game_end_2 = False
+
+    pause = False
+
+    wall_is_enable = False
+
+    if mode.mode == "Side wall on":
+        wall_is_enable = True
+        wall.generate_side_walls(snake, screen.width, screen.width)
+
+    if mode.mode == "Side wall off":
+        wall_is_enable = False
+    start_pause = True
+
+    buttons = dict_key_to_buttons()
+
+    snake.buttons_dict = dict_of_not_blocked_buttons()
+
+    snake.first_spawn(screen.height, screen.width, wall_is_enable)
+
+    def collision(tuple_1, tuple_2):
+        return tuple_1 == tuple_2
+
+    def get_online_snake():
+        while True:
+            data = client.recv(1024)
+            d = pickle.loads(data)
+            snake_2.body = d[1]
+            apple.x = d[0][0]
+            apple.y = pickle.loads(data)[0][1]
+            print(pickle.loads(data))
+
+    thread = threading.Thread(target=get_online_snake)
+
+    if collision(snake_2, snake):
+        snake.first_spawn(screen.height, screen.width, wall_is_enable)
+
+    thread.start()
+
+    list_of_data = []
+
+    apple_is_eaten = False
+    while not game_end_1 or not game_end_2:
+        list_of_data.clear()
+
+        list_of_data.append(snake.body)
+        list_of_data.append(apple_is_eaten)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            if event.type == pygame.KEYDOWN:
+                start_pause = False
+                if event.key == pygame.K_r:
+                    pause = not pause
+                    if pause:
+                        menu = create_pause_menu(on=True)
+                    if not menu.is_enabled():
+                        pause = False
+                if event.key == pygame.K_t:
+                    snake.body[-1] = snake.body[-2]
+                if event.key == pygame.K_l:
+                    snake.body[-1] = (apple.x, apple.y)
+                if event.key == pygame.K_u:
+                    snake.speed += 10
+                if event.key == pygame.K_i:
+                    snake.speed -= 10
+                if event.key == pygame.K_o:
+                    snake.length -= 5
+                if event.key == pygame.K_z:
+                    two_players()
+                    return
+
+        if not pause:
+
+            client.sendto((pickle.dumps(list_of_data)), server)
+            apple_is_eaten = False
+
+            surface.fill(pygame.Color(screen.color))
+            score_text = font.render(f'Score: {score}', True, "orange")
+            score_text_2 = font.render(f'Score: {score_2}', True, "blue")
+            if wall_is_enable:
+                if not game_end_1:
+                    game_end_1 = wall_collision(snake=snake, wall=wall) or snake_touching(snake) or snake_collision(
+                        snake, snake_2)
+                draw_wall(surface=surface,
+                          walls=wall,
+                          snake=snake)
+            else:
+                wall_teleport(snake, screen.height, screen.width)
+                if not game_end_1:
+                    game_end_1 = snake_touching(snake) or snake_collision(snake, snake_2)
+
+            draw_apple(surface, apple)
+
+            if not game_end_1:
+                draw_snake(surface, snake)
+            else:
+                snake.body.clear()
+                snake.body.append((-10, -10))
+
+            if not game_end_2:
+                # pygame.time.wait(int(1000 / snake_2.speed))
+                draw_snake(surface, snake_2)
+
+            else:
+                snake_2.body.clear()
+                snake_2.body.append((-5, -5))
+
+            if snake.body[-1] == (apple.x, apple.y):
+                snake.eating()
+                apple_is_eaten = True
+                score += 1
+
+            if score % 5 == 0 and not bad_apple_is_on:
+                if score != 0:
+                    bad_apple.spawn(snake, screen.height, screen.width)
+                    if (bad_apple.x, bad_apple.y) == (apple.x, apple.y):
+                        bad_apple.spawn(snake, screen.height, screen.width, wall_is_enable)
+                    bad_apple_is_on = True
+
+            if bad_apple_is_on:
+                draw_apple(surface, bad_apple)
+
+            if snake.body[-1] == (bad_apple.x, bad_apple.y):
+                score -= 7
+                bad_apple_is_on = False
+
+            if score < 0:
+                game_end_1 = True
+
+            if not game_end_1:
+                # pygame.time.wait(int(1000 / snake.speed))
+                snake.buttons_dict = snake.moving(buttons, snake.buttons_dict)
+
+            buttons = dict_key_to_buttons()
+            surface.blit(score_text, (0, 0))
+            surface.blit(score_text_2, (0, screen.width - snake.head_size))
+
+            pygame.display.flip()
+            while start_pause:
+                for event in pygame.event.get():
+                    if event.type == pygame.KEYDOWN:
+                        start_pause = False
+            clock.tick(max(snake.speed, snake_2.speed))

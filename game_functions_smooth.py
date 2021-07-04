@@ -1,7 +1,7 @@
 import pygame
-from Smooth.Objects_smooth import Snake, Apple, Wall, \
-    Screen, Bad_Apple, Mode, Second_Snake, dict_of_not_blocked_buttons, dict2_of_not_blocked_buttons, \
-    dict_key_to_buttons, dict2_key_to_buttons
+from Objects_smooth import Snake, Apple, Wall, \
+    Screen, Mode, Net, Online_snake, dict_of_not_blocked_buttons,\
+    dict_key_to_buttons, dict2_key_to_buttons, dict2_of_not_blocked_buttons, Bad_Apple
 
 
 def create_screen(height, width):
@@ -15,6 +15,7 @@ def start_clock():
 
 
 def draw_snake(surface, snake: Snake):
+    # pygame.time.wait(int(1000/snake.speed))
     [(pygame.draw.rect(surface=surface,
                        color=snake.color,
                        rect=(x, y, snake.head_size, snake.head_size))) for x, y in snake.body]
@@ -85,3 +86,11 @@ def change_length(value):
 
 def change_mode(attribute, *value):
     setattr(Mode, attribute, value[1])
+
+
+def change_net_host(value):
+    Net.host = value
+
+
+def change_net_port(value):
+    Net.port = int(value)

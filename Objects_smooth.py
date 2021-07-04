@@ -6,6 +6,7 @@ import pygame
 class Snake:
     color = "green"
     speed = 20
+    head_size = 25
 
     def __init__(self):
 
@@ -14,15 +15,14 @@ class Snake:
         self.length = 1
         self.body = []
 
-        self.head_size = 25
-
         self.step_x = 0
         self.step_y = 0
+
+        self.buttons_dict = {}
 
     def moving(self, buttons, not_blocked_button: dict):
         self.body.append((self.x, self.y))
         self.body = self.body[-self.length:]
-
 
         # print(is_second_snake, buttons)
         x = not_blocked_button
@@ -56,7 +56,7 @@ class Snake:
 
         self.length += 5
 
-        self.speed += 1
+        self.speed += 5
 
     def first_spawn(self, height, width, wall=False):
 
@@ -91,8 +91,8 @@ class Second_Snake(Snake):
 
 
 class Apple:
-    x = 0
-    y = 0
+    x = -100
+    y = -100
 
     color = "red"
 
@@ -146,13 +146,23 @@ class Wall:
 
 class Mode:
     mode = "Side wall off"
-    player = "Single"
+    player = "Online"
 
 
 class Screen:
     height = 500
     width = 500
     color = "black"
+
+
+class Online_snake(Snake):
+    color = "yellow"
+    speed = 20
+
+
+class Net:
+    host = '127.0.0.1'
+    port = 65432
 
 
 def dict_key_to_buttons():
