@@ -325,8 +325,6 @@ def online_two_players():
 
     bad_apple_is_on = False
 
-    score = 0
-    score_2 = 0
 
     surface = create_screen(screen.height, screen.width)
 
@@ -362,14 +360,16 @@ def online_two_players():
     def collision(tuple_1, tuple_2):
         return tuple_1 == tuple_2
 
+
     def get_online_snake():
         while True:
             data = client.recv(1024)
-            d = pickle.loads(data)
-            snake_2.body = d[1]
-            apple.x = d[0][0]
-            apple.y = pickle.loads(data)[0][1]
-            print(pickle.loads(data))
+            pickled_data = pickle.loads(data)
+            snake_2.body = pickled_data["Snake"]
+            apple.x = pickled_data["Apple"][0]
+            apple.y = pickled_data["Apple"][1]
+
+            snake_2.score = pickled_data["Score"]
 
     thread = threading.Thread(target=get_online_snake)
 
@@ -378,14 +378,15 @@ def online_two_players():
 
     thread.start()
 
-    list_of_data = []
+    dict_of_data = {}
 
     apple_is_eaten = False
     while not game_end_1 or not game_end_2:
-        list_of_data.clear()
+        dict_of_data.clear()
 
-        list_of_data.append(snake.body)
-        list_of_data.append(apple_is_eaten)
+        dict_of_data["Snake"] = snake.body
+        dict_of_data["Is eaten"] = apple_is_eaten
+        dict_of_data["Score"] = snake.score
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -409,17 +410,18 @@ def online_two_players():
                 if event.key == pygame.K_o:
                     snake.length -= 5
                 if event.key == pygame.K_z:
-                    two_players()
+                    online_two_players()
                     return
 
         if not pause:
 
-            client.sendto((pickle.dumps(list_of_data)), server)
+            client.sendto((pickle.dumps(dict_of_data)), server)
             apple_is_eaten = False
 
             surface.fill(pygame.Color(screen.color))
-            score_text = font.render(f'Score: {score}', True, "orange")
-            score_text_2 = font.render(f'Score: {score_2}', True, "blue")
+            score_text = font.render(f'Score: {snake.score}', True, "orange")
+            score_text_2 = font.render(f'Score: {snake_2.score}', True, "blue")
+
             if wall_is_enable:
                 if not game_end_1:
                     game_end_1 = wall_collision(snake=snake, wall=wall) or snake_touching(snake) or snake_collision(
@@ -451,10 +453,9 @@ def online_two_players():
             if snake.body[-1] == (apple.x, apple.y):
                 snake.eating()
                 apple_is_eaten = True
-                score += 1
 
-            if score % 5 == 0 and not bad_apple_is_on:
-                if score != 0:
+            if snake.score % 5 == 0 and not bad_apple_is_on:
+                if snake.score != 0:
                     bad_apple.spawn(snake, screen.height, screen.width)
                     if (bad_apple.x, bad_apple.y) == (apple.x, apple.y):
                         bad_apple.spawn(snake, screen.height, screen.width, wall_is_enable)
@@ -464,10 +465,10 @@ def online_two_players():
                 draw_apple(surface, bad_apple)
 
             if snake.body[-1] == (bad_apple.x, bad_apple.y):
-                score -= 7
+                snake.score -= 7
                 bad_apple_is_on = False
 
-            if score < 0:
+            if snake.score < 0:
                 game_end_1 = True
 
             if not game_end_1:

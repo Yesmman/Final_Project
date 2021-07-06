@@ -3,38 +3,43 @@ from Objects_smooth import Net, Apple, Snake, Screen
 import socket
 import pickle
 
-server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server.bind((Net.host, Net.port))
 
-clients = []
+def start_server():
+    server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server.bind((Net.host, Net.port))
 
-print('Start Server')
-apple = Apple()
-snake = Snake()
-apple.spawn(snake, Screen.height, Screen.width, False)
-list_of_data = []
-while True:
+    clients = []
 
-    data, address = server.recvfrom(1024)
+    print('Start Server')
+    apple = Apple()
+    snake = Snake()
+    apple.spawn(snake, Screen.height, Screen.width, False)
+    dict_of_data = {}
+    while True:
 
-    apple_body = (apple.x, apple.y)
-    snake_body = pickle.loads(data)[0]
-    is_eaten = pickle.loads(data)[1]
+        data, address = server.recvfrom(1024)
 
-    if is_eaten:
-        apple.spawn(snake, Screen.height, Screen.width, False)
+        pickled_data = pickle.loads(data)
         apple_body = (apple.x, apple.y)
-    if address not in clients:
-        clients.append(address)
+        snake_body = pickled_data["Snake"]
+        is_eaten = pickled_data["Is eaten"]
+        score = pickled_data["Score"]
 
-    list_of_data.append(apple_body)
-    list_of_data.append(snake_body)
+        if is_eaten:
+            apple.spawn(snake, Screen.height, Screen.width, False)
+            apple_body = (apple.x, apple.y)
+        if address not in clients:
+            clients.append(address)
 
-    data = pickle.dumps(list_of_data)
+        dict_of_data["Score"] = score
+        dict_of_data["Apple"] = apple_body
+        dict_of_data["Snake"] = snake_body
 
-    for client in clients:
-        if client == address:
-            continue
-        server.sendto(data, client)
+        data = pickle.dumps(dict_of_data)
 
-    list_of_data.clear()
+        for client in clients:
+            if client == address:
+                continue
+            server.sendto(data, client)
+
+        dict_of_data.clear()

@@ -9,6 +9,7 @@ class Snake:
     head_size = 25
 
     def __init__(self):
+        self.score = 0
 
         self.x = 0
         self.y = 0
@@ -57,6 +58,7 @@ class Snake:
         self.length += 5
 
         self.speed += 5
+        self.score +=1
 
     def first_spawn(self, height, width, wall=False):
 

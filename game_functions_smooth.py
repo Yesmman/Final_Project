@@ -1,7 +1,5 @@
-import pygame
-from Objects_smooth import Snake, Apple, Wall, \
-    Screen, Mode, Net, Online_snake, dict_of_not_blocked_buttons,\
-    dict_key_to_buttons, dict2_key_to_buttons, dict2_of_not_blocked_buttons, Bad_Apple
+
+from Objects_smooth import *
 
 
 def create_screen(height, width):
@@ -63,34 +61,3 @@ def wall_collision(snake: Snake, wall: Wall):
 def snake_collision(snake, snake_2):
     return snake.body[-1] in snake_2.body
 
-
-def change_color(obj: type, *value):
-    obj.color = value[1]
-
-
-def change_screen_height(value):
-    Screen.height = int(value)
-
-
-def change_screen_width(value):
-    Screen.width = int(value)
-
-
-def change_speed(value):
-    Snake.speed = int(value)
-
-
-def change_length(value):
-    Snake.length = int(value)
-
-
-def change_mode(attribute, *value):
-    setattr(Mode, attribute, value[1])
-
-
-def change_net_host(value):
-    Net.host = value
-
-
-def change_net_port(value):
-    Net.port = int(value)

@@ -2,10 +2,13 @@ import pygame_menu
 from functools import partial
 from pygame_menu.examples import create_example_window
 
-from game_functions_smooth import \
-    change_speed, change_screen_height, change_screen_width, \
-    change_mode, change_color, change_net_host, change_net_port
-from Objects_smooth import Snake, Screen, Apple, Bad_Apple, Mode, Wall, Second_Snake
+from change_functions import *
+
+from Objects_smooth import Snake, Screen, Apple, Bad_Apple, Mode, Wall, Second_Snake, Net, Online_snake
+
+from server import start_server
+
+import threading
 
 
 def main_menu():
@@ -45,7 +48,6 @@ def to_color_settings(menu, surface, main):
 
 
 def settings(surface, main):
-    # print(main)
     menu = pygame_menu.Menu(
         height=400,
         width=400,
@@ -65,7 +67,7 @@ def settings(surface, main):
                                                           surface=surface,
                                                           main=main))
     network_settings.hide()
-    if Mode.player == "online":
+    if Mode.player == "Online":
         network_settings.show()
 
     if main:
@@ -73,9 +75,7 @@ def settings(surface, main):
                                         menu=menu))
     else:
         menu.add.button("Back", partial(from_settings_to_pause_menu,
-                                        menu=menu,
-                                        surface=surface,
-                                        main=main))
+                                        menu=menu))
 
     menu.mainloop(surface)
 
@@ -94,8 +94,13 @@ def network(surface, main):
         title="Network"
     )
 
-    host = menu.add.text_input("Host: ")
-    port = menu.add.text_input("Port: ")
+    host = menu.add.text_input("Host: ",
+                               default=Net.host)
+    port = menu.add.text_input("Port: ",
+                               default=Net.port)
+
+    cant_start_server_label = menu.add.label("You can't start this server")
+    cant_start_server_label.hide()
 
     def commit():
         host_get = host.get_value()
@@ -109,6 +114,18 @@ def network(surface, main):
                                     menu=menu,
                                     surface=surface,
                                     main=main))
+
+    thread = threading.Thread(target=start_server)
+
+    def server_on():
+        cant_start_server_label.hide()
+        try:
+            thread.start()
+            # cant_start_server_label.hide()
+        except RuntimeError:
+            cant_start_server_label.show()
+
+    menu.add.button("Start server", server_on)
     menu.mainloop(surface)
 
 
@@ -233,11 +250,18 @@ def color(surface, main):
                       default=list_of_colors.index((Bad_Apple.color.title(), Bad_Apple.color)),
                       items=list_of_colors,
                       onchange=partial(change_color, Bad_Apple))
+
     if Mode.player == "Two":
         menu.add.selector(title="Second snake color: ",
                           default=list_of_colors.index((Second_Snake.color.title(), Second_Snake.color)),
                           items=list_of_colors,
                           onchange=partial(change_color, Second_Snake))
+
+    if Mode.player == "Online":
+        menu.add.selector(title="Online snake color: ",
+                          default=list_of_colors.index((Online_snake.color.title(), Online_snake.color)),
+                          items=list_of_colors,
+                          onchange=partial(change_color, Online_snake))
 
     menu.add.selector(title="Wall color",
                       default=list_of_colors.index((Wall.color.title(), Wall.color)),
