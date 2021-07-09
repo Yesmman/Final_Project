@@ -6,7 +6,7 @@ import pygame
 class Snake:
     color = "green"
     speed = 20
-    head_size = 25
+    head_size = 20
 
     def __init__(self):
         self.score = 0
@@ -25,7 +25,6 @@ class Snake:
         self.body.append((self.x, self.y))
         self.body = self.body[-self.length:]
 
-        # print(is_second_snake, buttons)
         x = not_blocked_button
 
         if enable_moving(self):
@@ -48,17 +47,17 @@ class Snake:
                 self.step_x = -1
                 self.step_y = 0
                 x = block_button(self, "d")
-        self.x += self.step_x * 5
-        self.y += self.step_y * 5
-        # print(x)
+        self.x += self.step_x * round(self.head_size ** (1 / 2))
+        self.y += self.step_y * round(self.head_size ** (1 / 2))
+
         return x
 
     def eating(self):
 
         self.length += 5
 
-        self.speed += 5
-        self.score +=1
+        self.speed += 2
+        self.score += 1
 
     def first_spawn(self, height, width, wall=False):
 
@@ -69,23 +68,6 @@ class Snake:
         if wall:
             if self.body[-1] in Wall.wall:
                 self.first_spawn(height, width, True)
-
-    # def first_spawn_when_two_snakes(self, snake, height, width, wall=False):
-    #     self.body.clear()
-    #     self.x = randrange(0, width, self.head_size)
-    #     print(self.x)
-    #
-    #     self.y = randrange(0, height, self.head_size)
-    #     print(self.y)
-    #
-    #     self.body.append((self.x, self.y))
-    #     if wall:
-    #         if self.body[-1] in Wall.wall:
-    #             self.first_spawn(height, width, True)
-    #     if self.body[-1] == snake.body[-1]:
-    #         print(self.body)
-    #         print(snake.body)
-    #         self.first_spawn_when_two_snakes(height, width, wall)
 
 
 class Second_Snake(Snake):
@@ -98,7 +80,7 @@ class Apple:
 
     color = "red"
 
-    size = 25
+    size = 20
 
     def spawn(self, snake: Snake, height, width, wall=False):
 
@@ -109,15 +91,6 @@ class Apple:
         if wall:
             if (self.x, self.y) in Wall.wall:
                 self.spawn(snake, height, width, True)
-    #
-    # def spawn_when_two_snakes(self, snake: Snake, second_snake: Snake, height, width, wall=False):
-    #     self.x = randrange(0, width, snake.head_size)
-    #     self.y = randrange(0, height, snake.head_size)
-    #     if (self.x, self.y) in snake.body or (self.x, self.y) in second_snake.body:
-    #         self.spawn_when_two_snakes(snake, second_snake, height, width)
-    #     if wall:
-    #         if (self.x, self.y) in Wall.wall:
-    #             self.spawn_when_two_snakes(snake, second_snake, height, width, True)
 
 
 class Bad_Apple(Apple):
@@ -135,6 +108,7 @@ class Wall:
         self.y = 0
         self.wall.clear()
         self.wall.append((self.x, self.y))
+
         while snake.head_size + self.x <= width:
             self.x += snake.head_size
             self.wall.append((self.x, self.y))
@@ -167,7 +141,7 @@ class Net:
     port = 65432
 
 
-def dict_key_to_buttons():
+def wasd_keys():
     key = pygame.key.get_pressed()
     dict_of_buttons = {
         "w": key[pygame.K_w],
@@ -211,7 +185,7 @@ def dict2_of_not_blocked_buttons():
     return dictionary
 
 
-def dict2_key_to_buttons():
+def numpad_keys():
     key = pygame.key.get_pressed()
     dict_of_buttons = {
         "w": key[pygame.K_KP5],
@@ -222,7 +196,7 @@ def dict2_key_to_buttons():
     return dict_of_buttons
 
 
-def dict_buttons_to_steps():
+def dict_steps():
     dictionary = {
         "w": (0, -1),
         "s": (0, 1),

@@ -1,4 +1,3 @@
-
 from Objects_smooth import *
 
 
@@ -13,7 +12,6 @@ def start_clock():
 
 
 def draw_snake(surface, snake: Snake):
-    # pygame.time.wait(int(1000/snake.speed))
     [(pygame.draw.rect(surface=surface,
                        color=snake.color,
                        rect=(x, y, snake.head_size, snake.head_size))) for x, y in snake.body]
@@ -36,7 +34,6 @@ def wall_teleport(snake: Snake, height, width):
         snake.y = width - snake.head_size
 
 
-#
 def snake_touching(snake):
     return len(snake.body) != len(set(snake.body))
 
@@ -61,3 +58,6 @@ def wall_collision(snake: Snake, wall: Wall):
 def snake_collision(snake, snake_2):
     return snake.body[-1] in snake_2.body
 
+
+def collision(tuple_1, tuple_2):
+    return tuple_1 == tuple_2

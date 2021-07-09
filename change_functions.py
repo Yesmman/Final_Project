@@ -1,4 +1,4 @@
-from Objects_smooth import Snake, Screen, Mode, Net
+from Objects_smooth import Snake, Screen, Mode, Net, Apple
 
 
 def change_color(obj: type, *value):
@@ -31,3 +31,8 @@ def change_net_host(value):
 
 def change_net_port(value):
     Net.port = int(value)
+
+
+def change_size(value):
+    Snake.head_size = int(value)
+    Apple.size = int(value)
