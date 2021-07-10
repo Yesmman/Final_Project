@@ -60,9 +60,9 @@ def single_game():
                         menu = create_pause_menu(on=True)
                     if not menu.is_enabled():
                         pause = False
-                if event.key == pygame.K_u:
+                if event.key == pygame.K_1:
                     snake.speed += 10
-                if event.key == pygame.K_i:
+                if event.key == pygame.K_2:
                     snake.speed -= 10
 
         if not pause:

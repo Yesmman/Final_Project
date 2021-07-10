@@ -10,7 +10,6 @@ def start_server():
 
     clients = []
 
-    print('Start Server')
     apple = Apple()
     snake = Snake()
     apple.spawn(snake, Screen.height, Screen.width, False)

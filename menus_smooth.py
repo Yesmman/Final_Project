@@ -1,12 +1,13 @@
 import pygame_menu
+import pygame
 from functools import partial
 from pygame_menu.examples import create_example_window
 
-from pygame_menu.locals import ALIGN_LEFT, ALIGN_CENTER
+from pygame_menu.locals import ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT
 
 from change_functions import *
 
-from Objects_smooth import Snake, Screen, Apple, Bad_Apple, Mode, Wall, Second_Snake, Net, Online_snake
+from Objects_smooth import Snake, Screen, Apple, Bad_Apple, Mode, Wall, Second_Snake, Net, Online_snake, dicts
 
 from server import start_server
 
@@ -214,8 +215,8 @@ def help_menu(surface, main):
                      "Nums:1, 2, 3, 5": "Second/Single player",
                      "R": "game pause (pause menu)",
                      "Z": "restart",
-                     "U": "speed up",
-                     "I": "speed down"}
+                     "1": "speed up",
+                     "2": "speed down"}
     explaining = ["Игра продолжается, пока не погибнут все змейки.",
 
                   "'Плохое' яблоко появляется каждые 5 очков.",
@@ -374,12 +375,68 @@ def controls(surface, main):
 
     menu.add.button("Commit", commit)
 
+    menu.add.button("Keys", partial(to_keys,
+                                    menu=menu,
+                                    surface=surface,
+                                    main=main))
     menu.add.button("Back", partial(to_settings,
                                     menu=menu,
                                     surface=surface,
                                     main=main))
 
     menu.mainloop(surface)
+
+
+def to_keys(menu, surface, main):
+    menu.close()
+    menu.disable()
+
+    keys(surface, main)
+
+
+def keys(surface, main):
+    menu = pygame_menu.Menu(
+        height=500,
+        width=500,
+        title="Keys",
+    )
+
+    menu.add.label("First player")
+
+    def change_key(dict_, text):
+        name = ""
+
+        while name != "return":
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+
+                    code = event.key
+                    name = pygame.key.name(code)
+                    if name != "return":
+                        dict_[text] = code
+        menu.close()
+        menu.disable()
+        keys(surface, main)
+
+    def show_controls(on_dict):
+        for items in on_dict.items():
+            x = menu.add.label(items[0], font_size=20)
+            y = menu.add.button(pygame.key.name(items[1]),
+                                font_size=20,
+                                action=partial(change_key, on_dict, x.get_title()))
+            f = menu.add.frame_h(200, 40).relax()
+            f.pack(x)
+            f.pack(y, align=ALIGN_RIGHT)
+
+    show_controls(dicts.first)
+
+    menu.add.label("Second player")
+    show_controls(dicts.second)
+    menu.add.button("Back", partial(to_controls,
+                                    menu=menu,
+                                    surface=surface,
+                                    main=main))
+    menu.mainloop(surface=surface)
 
 
 if __name__ == '__main__':

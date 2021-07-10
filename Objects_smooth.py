@@ -122,7 +122,7 @@ class Wall:
 
 class Mode:
     mode = "Side wall off"
-    player = "Online"
+    player = "One"
 
 
 class Screen:
@@ -144,10 +144,10 @@ class Net:
 def wasd_keys():
     key = pygame.key.get_pressed()
     dict_of_buttons = {
-        "w": key[pygame.K_w],
-        "s": key[pygame.K_s],
-        "a": key[pygame.K_a],
-        "d": key[pygame.K_d],
+        "w": key[dicts.second["Up"]],
+        "s": key[dicts.second["Down"]],
+        "a": key[dicts.second["Left"]],
+        "d": key[dicts.second["Right"]],
     }
     return dict_of_buttons
 
@@ -188,23 +188,35 @@ def dict2_of_not_blocked_buttons():
 def numpad_keys():
     key = pygame.key.get_pressed()
     dict_of_buttons = {
-        "w": key[pygame.K_KP5],
-        "s": key[pygame.K_KP2],
-        "a": key[pygame.K_KP1],
-        "d": key[pygame.K_KP3],
+        "w": key[dicts.first["Up"]],
+        "s": key[dicts.first["Down"]],
+        "a": key[dicts.first["Left"]],
+        "d": key[dicts.first["Right"]],
     }
     return dict_of_buttons
 
 
-def dict_steps():
-    dictionary = {
+def enable_moving(snake):
+    return snake.body[-1][0] % snake.head_size == 0 and snake.body[-1][1] % snake.head_size == 0
+
+
+class dicts:
+
+    dict_steps = {
         "w": (0, -1),
         "s": (0, 1),
         "d": (1, 0),
         "a": (-1, 0),
     }
-    return dictionary
-
-
-def enable_moving(snake):
-    return snake.body[-1][0] % snake.head_size == 0 and snake.body[-1][1] % snake.head_size == 0
+    first = {
+        "Up": pygame.K_KP5,
+        "Down": pygame.K_KP2,
+        "Left": pygame.K_KP1,
+        "Right": pygame.K_KP3,
+    }
+    second = {
+        "Up": pygame.K_w,
+        "Down": pygame.K_s,
+        "Left": pygame.K_a,
+        "Right": pygame.K_d,
+    }
