@@ -29,23 +29,19 @@ class Snake:
 
         if enable_moving(self):
             if buttons["w"] and not_blocked_button["w"]:
-                self.step_x = 0
-                self.step_y = -1
+                self.step_x, self.step_y = dicts.dict_steps["w"]
                 x = block_button(self, "s")
 
             if buttons["s"] and not_blocked_button["s"]:
-                self.step_x = 0
-                self.step_y = 1
+                self.step_x, self.step_y = dicts.dict_steps["s"]
                 x = block_button(self, "w")
 
             if buttons["d"] and not_blocked_button["d"]:
-                self.step_x = 1
-                self.step_y = 0
+                self.step_x, self.step_y = dicts.dict_steps["d"]
                 x = block_button(self, "a")
 
             if buttons["a"] and not_blocked_button["a"]:
-                self.step_x = -1
-                self.step_y = 0
+                self.step_x, self.step_y = dicts.dict_steps["a"]
                 x = block_button(self, "d")
         self.x += self.step_x * round(self.head_size ** (1 / 2))
         self.y += self.step_y * round(self.head_size ** (1 / 2))
