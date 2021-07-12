@@ -403,27 +403,24 @@ def keys(surface, main):
 
     menu.add.label("First player")
 
-    def change_key(dict_, text):
+    def change_key(button: pygame_menu.widgets.Button, label, dict_, text):
         name = ""
 
         while name != "return":
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
-
                     code = event.key
                     name = pygame.key.name(code)
                     if name != "return":
                         dict_[text] = code
-        menu.close()
-        menu.disable()
-        keys(surface, main)
+        button.set_title(pygame.key.name(dict_[label.get_title()]))
 
     def show_controls(on_dict):
         for items in on_dict.items():
             x = menu.add.label(items[0], font_size=20)
             y = menu.add.button(pygame.key.name(items[1]),
-                                font_size=20,
-                                action=partial(change_key, on_dict, x.get_title()))
+                                font_size=20, )
+            y.set_onreturn(partial(change_key, y, x, on_dict, x.get_title()))
             f = menu.add.frame_h(200, 40).relax()
             f.pack(x)
             f.pack(y, align=ALIGN_RIGHT)
