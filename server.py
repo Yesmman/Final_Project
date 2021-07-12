@@ -6,7 +6,7 @@ import pickle
 
 def start_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server.bind((Net.host, Net.port))
+    server.bind(("0.0.0.0", Net.port))
 
     clients = []
 
