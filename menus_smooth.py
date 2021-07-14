@@ -352,8 +352,12 @@ def controls(surface, main):
         ("Side wall", "Side wall on"),
         ("Without side walls", "Side wall off")
     ]
+    i = 0
+    for ind in range(len(list_of_modes)):
+        if list_of_modes[ind][1] == Mode.mode:
+            i = ind
     menu.add.selector("Wall mode",
-                      default=1,
+                      default=i,
                       items=list_of_modes,
                       onchange=partial(change_mode, "mode"))
 
@@ -362,9 +366,13 @@ def controls(surface, main):
         ("Two players", "Two"),
         ("Online", "Online")
     ]
-
+    i = 0
+    for ind in range(len(list_num_of_players)):
+        if list_num_of_players[ind][1] == Mode.player:
+            i = ind
+            break
     menu.add.selector("Players: ",
-                      default=1,
+                      default=i,
                       items=list_num_of_players,
                       onchange=partial(change_mode, "player"))
 

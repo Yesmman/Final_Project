@@ -51,7 +51,7 @@ class Snake:
     def eating(self):
 
         self.length += 5
-
+        Snake.speed += 2
         self.speed += 2
         self.score += 1
 
@@ -197,7 +197,6 @@ def enable_moving(snake):
 
 
 class dicts:
-
     dict_steps = {
         "w": (0, -1),
         "s": (0, 1),
