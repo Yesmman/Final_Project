@@ -3,6 +3,7 @@ from menus_smooth import create_pause_menu
 import socket
 import pickle
 
+import threading
 
 def single_game():
     pygame.display.set_caption("Snake: 1 player")
