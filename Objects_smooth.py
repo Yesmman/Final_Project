@@ -10,7 +10,7 @@ class Snake:
 
     def __init__(self):
         self.score = 0
-        self.speed = 20
+        self.speed = 80
         self.x = 0
         self.y = 0
         self.length = 1
@@ -43,16 +43,16 @@ class Snake:
             if buttons["a"] and not_blocked_button["a"]:
                 self.step_x, self.step_y = dicts.dict_steps["a"]
                 x = block_button(self, "d")
-        self.x += self.step_x * round(self.head_size ** (1 / 2))
-        self.y += self.step_y * round(self.head_size ** (1 / 2))
+        self.x += self.step_x
+        self.y += self.step_y
 
         return x
 
     def eating(self):
 
-        self.length += 5
+        self.length += self.head_size
         Snake.speed += 2
-        self.speed += 2
+        self.speed += 10
         self.score += 1
 
     def first_spawn(self, height, width, wall=False):
