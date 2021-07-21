@@ -1,5 +1,5 @@
 import pygame_menu
-import pygame
+
 from functools import partial
 from pygame_menu.examples import create_example_window
 
@@ -42,8 +42,8 @@ def main_menu():
 
 def create_pause_menu(on):
     menu = pygame_menu.Menu(
-        height=200,
-        width=200,
+        height=300,
+        width=300,
         title="Paused"
     )
     if on:
@@ -215,17 +215,17 @@ def help_menu(surface, main):
                      "Z": "restart",
                      "1": "speed up",
                      "2": "speed down"}
-    explaining = ["Игра продолжается, пока не погибнут все змейки.",
+    explaining = ["The game continues until all the snakes are killed. ",
 
-                  "'Плохое' яблоко появляется каждые 5 очков.",
+                  "A 'bad' apple appears every 5 points.",
 
-                  "При поедании плохого яблока снимается 7 очков.",
+                  "Eating a bad apple deducts 7 points.",
 
-                  "Игра окончена, если змейка столкнулась со стеной/другой змейкой"
-                  ""
-                  " или если количество очков меньше 0.",
+                  "Game over if snake hits wall / other snake",
 
-                  "Побеждает тот, у кого большее количество очков/заполнили максимум экрана"]
+                  "or if the number of points is less than 0.",
+
+                  "The winner is the one with the most points / filled the maximum screen"]
 
     f1 = menu.add.frame_v(150, 100, align=ALIGN_LEFT).relax()
     f2 = menu.add.frame_v(20, 100).relax()
@@ -425,6 +425,30 @@ def keys(surface, main):
                                     surface=surface,
                                     main=main))
     menu.mainloop(surface=surface)
+
+
+def winner_menu(surface, point_1, point_2):
+    menu = pygame_menu.Menu(
+        height=500,
+        width=500,
+        title="End game",
+    )
+    menu.add.label(f"First player score: {point_1}")
+    menu.add.label(f"Second player score: {point_2}")
+    if point_1 > point_2:
+        menu.add.label("Player 1 won")
+    elif point_1 < point_2:
+        menu.add.label("Player 2 won")
+    else:
+        menu.add.label("Draw")
+
+    from smooth_snake import two_players
+
+    menu.add.button("Restart", two_players)
+    menu.add.button("To menu", main_menu)
+    menu.add.button("Exit", lambda: exit())
+
+    menu.mainloop(surface)
 
 
 if __name__ == '__main__':

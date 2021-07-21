@@ -1,9 +1,10 @@
 from game_functions_smooth import *
-from menus_smooth import create_pause_menu
+from menus_smooth import create_pause_menu, winner_menu
 import socket
 import pickle
 
 import threading
+
 
 def single_game():
     pygame.display.set_caption("Snake: 1 player")
@@ -47,7 +48,6 @@ def single_game():
 
     snake.first_spawn(screen.height, screen.width, wall_is_enable)
     apple.spawn(snake, screen.height, screen.width, wall_is_enable)
-
 
     while not game_end:
         for event in pygame.event.get():
@@ -282,6 +282,7 @@ def two_players():
                     if event.type == pygame.KEYDOWN:
                         start_pause = False
             clock.tick(max(snake.speed, snake_2.speed))
+    end_menu = winner_menu(surface, snake.score, snake_2.score)
 
 
 def online_two_players():
