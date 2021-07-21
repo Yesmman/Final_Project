@@ -10,7 +10,7 @@ class Snake:
 
     def __init__(self):
         self.score = 0
-
+        self.speed = 20
         self.x = 0
         self.y = 0
         self.length = 1
@@ -71,8 +71,9 @@ class Second_Snake(Snake):
 
 
 class Apple:
-    x = -100
-    y = -100
+    def __init__(self):
+        self.x = -100
+        self.y = -100
 
     color = "red"
 
@@ -118,7 +119,7 @@ class Wall:
 
 class Mode:
     mode = "Side wall off"
-    player = "One"
+    # player = "One"
 
 
 class Screen:

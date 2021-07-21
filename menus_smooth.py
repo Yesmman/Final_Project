@@ -25,7 +25,10 @@ def main_menu():
         title="Main menu"
     )
 
-    menu.add.button("Play", play)
+    menu.add.button("Single player", partial(play, 1))
+    menu.add.button("Two players", partial(play, 2))
+    menu.add.button("Online", partial(play, 3))
+
     menu.add.button("Settings", partial(to_settings,
                                         menu=menu,
                                         surface=surface,
@@ -88,14 +91,10 @@ def settings(surface, main):
                                         surface=surface,
                                         main=main))
 
-    network_settings = menu.add.button("Network", partial(to_network,
-                                                          menu=menu,
-                                                          surface=surface,
-                                                          main=main))
-    network_settings.hide()
-
-    if Mode.player == "Online":
-        network_settings.show()
+    menu.add.button("Network", partial(to_network,
+                                       menu=menu,
+                                       surface=surface,
+                                       main=main))
 
     if main:
         menu.add.button("Back", partial(from_settings_to_main_menu,
@@ -121,7 +120,7 @@ def network(surface, main):
         title="Network"
     )
 
-    host = menu.add.text_input("Host: ",
+    host = menu.add.text_input("IP: ",
                                default=Net.host)
     port = menu.add.text_input("Port: ",
                                default=Net.port)
@@ -170,15 +169,14 @@ def from_settings_to_pause_menu(menu):
     create_pause_menu(True)
 
 
-def play():
+def play(num):
     from smooth_snake import single_game, two_players, online_two_players
-
-    if Mode.player == "Two":
-        two_players()
-    elif Mode.player == "One":
-        single_game()
-    elif Mode.player == "Online":
-        online_two_players()
+    modes = {
+        1: single_game,
+        2: two_players,
+        3: online_two_players
+    }
+    modes[num]()
 
 
 def to_help_menu(menu, surface, main):
@@ -360,21 +358,6 @@ def controls(surface, main):
                       default=i,
                       items=list_of_modes,
                       onchange=partial(change_mode, "mode"))
-
-    list_num_of_players = [
-        ("Single player", "One"),
-        ("Two players", "Two"),
-        ("Online", "Online")
-    ]
-    i = 0
-    for ind in range(len(list_num_of_players)):
-        if list_num_of_players[ind][1] == Mode.player:
-            i = ind
-            break
-    menu.add.selector("Players: ",
-                      default=i,
-                      items=list_num_of_players,
-                      onchange=partial(change_mode, "player"))
 
     def commit():
         for index in range(len(list_of_buttons)):
